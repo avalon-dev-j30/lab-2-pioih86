@@ -1,6 +1,11 @@
 package ru.avalon.java.j30.labs;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Properties;
@@ -25,15 +30,27 @@ public class Main {
         /*
          * TODO #01 Подключите к проекту все библиотеки, необходимые для соединения с СУБД.
          */
+        if(true) {
         try (Connection connection = getConnection()) {
             ProductCode code = new ProductCode("MO", 'N', "Movies");
             code.save(connection);
             printAllCodes(connection);
+            
+            System.out.println("---------------------");
 
             code.setCode("MV");
             code.save(connection);
             printAllCodes(connection);
         }
+        }
+        
+//        Connection connection = getConnection();
+//        PreparedStatement stmt = ProductCode.getSelectQuery(getConnection());
+//        ResultSet result = stmt.executeQuery();
+//        while(result.next()){
+//            System.out.println(result.getString("PROD_CODE"));
+//        }
+        
         /*
          * TODO #14 Средствами отладчика проверьте корректность работы программы
          */
@@ -56,10 +73,8 @@ public class Main {
      * @return URL в виде объекта класса {@link String}
      */
     private static String getUrl() {
-        /*
-         * TODO #02 Реализуйте метод getUrl
-         */
-        throw new UnsupportedOperationException("Not implemented yet!");
+
+        return "jdbc:derby://localhost:1527/sample";
     }
     /**
      * Возвращает параметры соединения
@@ -67,11 +82,23 @@ public class Main {
      * @return Объект класса {@link Properties}, содержащий параметры user и 
      * password
      */
+    
+    
+    /*
+     *  WRONG PROPERTIES EXCEPTIONS  ???
+     */
     private static Properties getProperties() {
-        /*
-         * TODO #03 Реализуйте метод getProperties
-         */
-        throw new UnsupportedOperationException("Not implemented yet!");
+
+        Properties properties = new Properties();
+        try (InputStream stream = ClassLoader.
+                getSystemResourceAsStream("resources/db.properties")) {
+            properties.load(stream);
+        } catch (IOException e) {
+            System.out.println("Can't load properties " + e.getMessage());
+        } catch (NullPointerException e) {
+            System.out.println("Can't load properties " + e.getMessage());
+        }
+        return properties;
     }
     /**
      * Возвращает соединение с базой данных Sample
@@ -80,10 +107,9 @@ public class Main {
      * @throws SQLException 
      */
     private static Connection getConnection() throws SQLException {
-        /*
-         * TODO #04 Реализуйте метод getConnection
-         */
-        throw new UnsupportedOperationException("Not implemented yet!");
+        
+        Properties properties = getProperties();
+        return DriverManager.getConnection(getUrl(), getProperties());
     }
     
 }
